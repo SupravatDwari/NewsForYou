@@ -1,0 +1,12 @@
+bin/
+.vs/
+obj/
+upload/
+uploads/
+packages/
+/packages/
+node_modules/
+*.suo
+*.user
+.DS_Store
+/logs/
