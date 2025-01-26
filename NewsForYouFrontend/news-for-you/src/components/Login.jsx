@@ -14,7 +14,7 @@ const Login = () => {
     const payload = { email, password };
 
     try {
-      const response = await axios.post("/api/login", payload);
+      const response = await axios.post("https://localhost:7235/api/login", payload);
       const result = response.data;
 
       if (result.authenticate) {
@@ -27,12 +27,12 @@ const Login = () => {
           result.jwtToken
         };expires=${expirationDate.toUTCString()};path=/;`;
 
-        if (email === "admin@gmail.com" && password === "admin") {
+        if (email === "sdwari@gmail.com" && password === "Test@123") {
           document.cookie = `isAdmin=true;expires=${expirationDate.toUTCString()};path=/;`;
         }
 
         alert("Login Successful");
-        window.location.href = "/Startup.html"; // Adjust this for React routing
+        window.location.href = "/Admin"; // Adjust this for React routing
       } else {
         alert("Invalid credentials");
       }

@@ -20,18 +20,18 @@ const App = () => {
   };
 
   useEffect(() => {
-    // if (!isAdmin()) {
-    //   window.location.href = "/login";
-    // }
+    if (!isAdmin()) {
+      window.location.href = "/login";
+    }
 
     // Fetch categories and agencies
     axios
-      .get("/api/category")
+      .get("https://localhost:7235/api/category")
       .then((response) => setCategories(response.data.result))
       .catch(() => alert("Error while fetching categories."));
 
     axios
-      .get("/api/agency")
+      .get("https://localhost:7235/api/agency")
       .then((response) => setAgencies(response.data.result))
       .catch(() => alert("Error while fetching agencies."));
   }, []);
@@ -44,7 +44,7 @@ const App = () => {
     }
 
     axios
-      .post("/api/category", { title: categoryName.trim() })
+      .post("https://localhost:7235/api/category", { title: categoryName.trim() })
       .then(() => alert("Category added"))
       .catch(() => alert("Error while adding category."));
   };
@@ -57,7 +57,7 @@ const App = () => {
     }
 
     axios
-      .post("/api/agency", {
+      .post("https://localhost:7235//api/agency", {
         name: agencyName.trim(),
         logopath: logoPath.trim(),
       })
@@ -79,7 +79,7 @@ const App = () => {
     };
 
     axios
-      .post("/api/addagencyfeed", payload)
+      .post("https://localhost:7235/api/addagencyfeed", payload)
       .then(() => alert("Feed link added"))
       .catch(() => alert("Error while adding feed link."));
   };
@@ -187,12 +187,12 @@ const App = () => {
                   ))}
                 </select>
                 <select
-                  className="form-select mt-2"
+                  className="form-select"
                   value={feedAgency}
                   onChange={(e) => setFeedAgency(e.target.value)}>
                   {agencies.map((agency) => (
                     <option key={agency.id} value={agency.id}>
-                      {agency.name}
+                      {agency.agencyName}
                     </option>
                   ))}
                 </select>
