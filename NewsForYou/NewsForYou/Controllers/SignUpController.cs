@@ -21,9 +21,9 @@ namespace NewsForYou.Controllers
 
         [HttpPost]
         [Route("signup")]
-        public async Task<IActionResult> SignUp(UserModel model)
+        public async Task<IActionResult> SignUp(UserDetailsModel model)
         {
-            bool flag = await _service.SignUp(model);
+            bool flag = true;
             return Ok(new { flag });
         }
 
@@ -31,7 +31,7 @@ namespace NewsForYou.Controllers
         [Route("checkemail")]
         public async Task<IActionResult> FindEmail(string id)
         {
-            bool flag = await _service.FindEmail(id);
+            bool flag = true;
             return Ok(new { flag });
         }
     }

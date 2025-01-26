@@ -19,9 +19,9 @@ namespace NewsForYou.Business
             _dataAccess = dataAccess;
         }
 
-        public async Task<bool> SignUp(UserModel model)
+        public async Task<bool> SignUp(UserDetailsModel model)
         {
-            User newStudent = new User
+            UserDetail newStudent = new UserDetail
             {
                 Name = model.Name,
                 Email = model.Email,
@@ -30,7 +30,7 @@ namespace NewsForYou.Business
             return await _dataAccess.SignUp(newStudent);
         }
 
-        public async Task<UserModel> Login(LoginModel model)
+        public async Task<UserDetailsModel> Login(LoginModel model)
         {
             return await _dataAccess.Login(model);
         }
@@ -39,7 +39,7 @@ namespace NewsForYou.Business
         {
             Category newCategory = new Category
             {
-                CategoryTitle = category.Title,
+                Title = category.Title,
             };
             return await _dataAccess.AddCategory(newCategory);
         }

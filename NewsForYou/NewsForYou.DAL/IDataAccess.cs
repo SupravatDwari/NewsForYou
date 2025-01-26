@@ -10,9 +10,9 @@ namespace NewsForYou.DAL
 {
     public interface IDataAccess
     {
-        public Task<bool> SignUp(User model);
+        public Task<bool> SignUp(UserDetail model);
 
-        public Task<UserModel> Login(LoginModel model);
+        public Task<UserDetailsModel> Login(LoginModel model);
 
         public Task<bool> AddCategory(Category newCategory);
 

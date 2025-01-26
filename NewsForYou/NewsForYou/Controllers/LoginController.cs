@@ -25,7 +25,7 @@ namespace NewsForYou.Controllers
         [Route("login")]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            UserModel result = await _service.Login(model);
+            UserDetailsModel result = await _service.Login(model);
             if (result != null)
             {
                 return Ok(new { authenticate = result != null, jwtToken = GenerateToken(result) });
@@ -36,7 +36,7 @@ namespace NewsForYou.Controllers
             }
         }
 
-        private string GenerateToken(UserModel userCredentials)
+        private string GenerateToken(UserDetailsModel userCredentials)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

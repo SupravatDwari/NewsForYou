@@ -31,7 +31,7 @@ namespace NewsForYou.Controllers
         [Route("getnewsbycategories")]
         public async Task<IActionResult> GetNewsByCategories(GetNewsByCategoriesModel model)
         {
-            List<NewsModel> allnews = await _service.GetNewsByCategories(model.Categories, model.Id); 
+            List<NewsModel> allnews = await _service.GetNewsByCategories(model.Categories, model.Id);
             return Ok(new { allnews });
         }
 

@@ -11,7 +11,7 @@ public partial class Agency
 
     public string? AgencyLogoPath { get; set; }
 
-    public virtual ICollection<AgencyFeed> AgencyFeeds { get; set; } = new List<AgencyFeed>();
+    public virtual AgencyFeed? AgencyFeed { get; set; }
 
     public virtual ICollection<News> News { get; set; } = new List<News>();
 }

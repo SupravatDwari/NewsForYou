@@ -21,7 +21,6 @@ namespace NewsForYou.Controllers
 
         [HttpGet]
         [Route("category")]
-        [Authorize]
         public async Task<IActionResult> GetCategory()
         {
             List<CategoryModel> result = await _service.GetCategory();
@@ -52,7 +51,6 @@ namespace NewsForYou.Controllers
 
         [HttpPost]
         [Route("category")]
-        [Authorize]
         public async Task<IActionResult> AddCategory(CategoryModel model)
         {
             bool flag = await _service.AddCategory(model);

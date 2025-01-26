@@ -23,7 +23,7 @@ namespace NewsForYou.Controllers
         [HttpGet]
         [Route("agency")]
         public async Task<IActionResult> GetAgency()
-       {
+        {
             List<AgencyModel> result = await _service.GetAgency();
             if (result.Count > 0)
             {
@@ -31,7 +31,7 @@ namespace NewsForYou.Controllers
             }
             else
             {
-                return NotFound(new {result});
+                return NotFound(new { result });
             }
         }
 

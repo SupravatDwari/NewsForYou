@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NewsForYou.Models;
 using NewsForYou.Business;
 using NewsForYou.DAL;
-using NewsForYou.DAL.Models;
+//using NewsForYou.DAL.Models;
 using Microsoft.Extensions.Options;
 using NewsForYou;
 using Microsoft.AspNetCore.Diagnostics;
@@ -10,6 +10,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using NewsForYou.DAL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +20,13 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowOrigin",
         builder =>
         {
-            builder.WithOrigins("http://127.0.0.1:5500", "https://127.0.0.1:5500")
+            builder.WithOrigins("http://localhost:3000", "http://localhost:3000", "https://127.0.0.1:3000")
                    .AllowAnyMethod()  // You might need this to allow any method, or you can specify specific methods.
                    .AllowAnyHeader()  // Allow any header, or you can specify specific headers.
                    .AllowCredentials();  // If your request includes credentials like cookies, you need to allow credentials.
         });
 });
 
-builder.Services.AddAuthorization(); // Add this line to configure authorization services
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -52,13 +52,11 @@ builder.Services.AddScoped<IService, Service>();
 builder.Services.AddScoped<IDataAccess, DataAccess>();
 builder.Services.AddSingleton<NewsForYou.Logger.ILogger>(new NewsForYou.Logger.Logger(loggingFolderPath));
 
-builder.Services.AddDbContext<NewsForYouContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
+builder.Services.AddDbContext<NewsForYouContext>();
 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
 
 
 var app = builder.Build();

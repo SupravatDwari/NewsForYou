@@ -12,6 +12,7 @@ using System.Xml;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Xml.Linq;
 
 namespace NewsForYou.DAL
 {
@@ -27,19 +28,19 @@ namespace NewsForYou.DAL
             this.logger = logger;
         }
 
-        public async Task<bool> SignUp(User newStudent)
+        public async Task<bool> SignUp(UserDetail newStudent)
         {
             bool flag = false;
-            await context.Users.AddAsync(newStudent);
+            await context.UserDetails.AddAsync(newStudent);
             await context.SaveChangesAsync();
             flag = true;
             return flag;
         }
 
-        public async Task<UserModel?> Login(LoginModel login)
+        public async Task<UserDetailsModel?> Login(LoginModel login)
         {
             bool flag = false;
-            User user = await context.Users.FirstOrDefaultAsync(u => u.Email == login.Email);
+            UserDetail user = await context.UserDetails.FirstOrDefaultAsync(u => u.Email == login.Email);
 
             if (user != null)
             {
@@ -48,10 +49,10 @@ namespace NewsForYou.DAL
                     flag = true;
                 }
             }
-            return flag ? new UserModel { Name = user.Name, Email = user.Email } : null;
+            return flag ? new UserDetailsModel { Name = user.Name, Email = user.Email } : null;
         }
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(UserDetail user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ThisIsASecretKeyWithAtLeast16Bytes"));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -87,8 +88,8 @@ namespace NewsForYou.DAL
             bool flag = false;
             Agency newAgency = new Agency
             {
-                AgencyLogoPath = agency.Logopath,
-                AgencyName = agency.Name,
+                AgencyLogoPath = agency.AgencyLogopath,
+                AgencyName = agency.AgencyName,
             };
             await context.Agencies.AddAsync(newAgency);
             await context.SaveChangesAsync();
@@ -131,7 +132,7 @@ namespace NewsForYou.DAL
             {
                 alldata.Add(new CategoryModel
                 {
-                    Title = category.CategoryTitle,
+                    Title = category.Title,
                     Id = category.CategoryId,
                 });
             }
@@ -149,9 +150,9 @@ namespace NewsForYou.DAL
             {
                 alldata.Add(new AgencyModel
                 {
-                    Logopath = agency.AgencyLogoPath,
-                    Name = agency.AgencyName,
-                    Id = agency.AgencyId,
+                    AgencyLogopath = agency.AgencyLogoPath,
+                    AgencyName = agency.AgencyName,
+                    AgencyId = agency.AgencyId,
                 });
             }
 
@@ -161,7 +162,7 @@ namespace NewsForYou.DAL
         public async Task<string> GetAgencyUrl(int categoryid, int agencyid)
         {
             string url = null;
-
+            var x = await context.AgencyFeeds.Where(x => x.CategoryId == 3).ToListAsync();
             AgencyFeed agencyfeed = await context.AgencyFeeds.FirstOrDefaultAsync(af => af.CategoryId == categoryid && af.AgencyId == agencyid);
             url = agencyfeed.AgencyFeedUrl;
 
@@ -184,7 +185,7 @@ namespace NewsForYou.DAL
             allcategories = await context.AgencyFeeds.Where(a => a.AgencyId == id).Select(a => new CategoryModel
             {
                 Id = a.CategoryId,
-                Title = a.Category.CategoryTitle
+                Title = a.Category.Title
             }).ToListAsync();
 
             return allcategories;
@@ -233,7 +234,7 @@ namespace NewsForYou.DAL
                     string url = await agencyFeedUrl;
                     if (!string.IsNullOrEmpty(url))
                     {
-                        string xmlData = FetchXmlData(url);
+                        string xmlData = await FetchXmlData(url);
                         if (!string.IsNullOrEmpty(xmlData))
                         {
                             List<NewsModel> newsData = ParseXmlData(xmlData);
@@ -297,7 +298,7 @@ namespace NewsForYou.DAL
             List<News> resultnews = new List<News>();
             foreach (NewsModel item in news)
             {
-                bool extnews = await context.News.AnyAsync(n => n.NewsLink == item.NewsLink);
+                bool extnews = await context.News.AnyAsync(n => n.NewsLink.ToString() == item.NewsLink);
                 if (!extnews)
                 {
                     News n = new News
@@ -320,49 +321,63 @@ namespace NewsForYou.DAL
             return flag;
         }
 
-        private static string FetchXmlData(string agencyFeedUrl)
+        public async Task<string> FetchXmlData(string url)
         {
-            using (WebClient client = new WebClient())
+            using (HttpClient client = new HttpClient())
             {
-                return client.DownloadString(agencyFeedUrl);
-            }
-        }
-
-        private static List<NewsModel> ParseXmlData(string data)
-        {
-            List<NewsModel> newsDataList = new List<NewsModel>();
-
-            XmlDocument xmlDocument = new XmlDocument();
-            xmlDocument.LoadXml(data);
-
-            XmlNodeList Nodes = xmlDocument.SelectNodes("//item");
-
-            foreach (XmlNode itemNode in Nodes)
-            {
-                var newstitle = itemNode.SelectSingleNode("title")?.InnerText;
-                var newsdescription = itemNode.SelectSingleNode("description")?.InnerText;
-                var newslink = itemNode.SelectSingleNode("link")?.InnerText;
-                var newsdatetime = itemNode.SelectSingleNode("pubDate")?.InnerText;
-
-                DateTime newspublishDateTime;
-                if (DateTime.TryParse(newsdatetime, out newspublishDateTime))
+                try
                 {
-                    newsDataList.Add(new NewsModel
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    if (response.IsSuccessStatusCode)
                     {
-                        NewsTitle = newstitle,
-                        NewsDescription = newsdescription,
-                        NewsLink = newslink,
-                        NewsPublishDateTime = newspublishDateTime
-                    });
+                        return await response.Content.ReadAsStringAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions (e.g., network errors)
+                    Console.WriteLine($"Error fetching XML data: {ex.Message}");
                 }
             }
+            return string.Empty;
+        }
 
-            return newsDataList;
+        public List<NewsModel> ParseXmlData(string xmlData)
+        {
+            List<NewsModel> newsList = new List<NewsModel>();
+
+            try
+            {
+                XDocument xmlDoc = XDocument.Parse(xmlData);
+
+                // Get all the <item> elements, which represent individual news articles
+                var items = xmlDoc.Descendants("item");
+
+                foreach (var item in items)
+                {
+                    var newsItem = new NewsModel
+                    {
+                        NewsTitle = item.Element("title")?.Value,
+                        NewsLink = item.Element("link")?.Value,
+                        NewsDescription = item.Element("description")?.Value,
+                        NewsPublishDateTime = DateTime.Parse(item.Element("pubDate")?.Value)
+                    };
+
+                    newsList.Add(newsItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle parsing exceptions if any
+                Console.WriteLine($"Error parsing XML: {ex.Message}");
+            }
+
+            return newsList;
         }
 
         public async Task<bool> FindEmail(string email)
         {
-            return !(await context.Users.Where(u => u.Email == email).AnyAsync());
+            return !(await context.UserDetails.Where(u => u.Email == email).AnyAsync());
         }
     }
 }

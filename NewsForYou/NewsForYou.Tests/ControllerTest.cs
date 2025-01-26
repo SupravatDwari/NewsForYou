@@ -66,7 +66,7 @@ namespace NewsForYou.Tests
             // Arrange
             var mockService = new Mock<IService>();
             var mockConfig = new Mock<IConfiguration>();
-            var controller = new CategoryController(mockService.Object, mockConfig.Object);
+            var controller = new CategoryController(mockService.Object,mockConfig.Object);
             var categories = new List<CategoryModel>
                 {
                     new CategoryModel { Id = 1, Title = "Sports" },
@@ -110,7 +110,7 @@ namespace NewsForYou.Tests
 
             var mockService = new Mock<IService>();
             var mockConfig = new Mock<IConfiguration>();
-            var controller = new AgencyController(mockService.Object, mockConfig.Object);
+            var controller = new AgencyController(mockService.Object,mockConfig.Object);
             var agencies = new List<AgencyModel>
             {
                 new AgencyModel { Id = 1, Name = "Times of India" },
@@ -168,13 +168,13 @@ namespace NewsForYou.Tests
         {
             var mockService = new Mock<IService>();
             var mockConfig = new Mock<IConfiguration>();
-            var controller = new NewsController(mockService.Object, mockConfig.Object);
+            var controller = new NewsController(mockService.Object,mockConfig.Object);
             int categoryId = 1;
 
             var result = await controller.GetAllNews(categoryId);
 
 
-            Assert.NotNull(result);
+            Assert.NotNull(result); 
         }
 
         [Fact]
@@ -227,7 +227,7 @@ namespace NewsForYou.Tests
 
             var mockService = new Mock<IService>();
             var mockConfig = new Mock<IConfiguration>();
-            var controller = new NewsForYouController(mockService.Object, mockConfig.Object);
+            var controller = new NewsForYouController(mockService.Object,mockConfig.Object);
             var id = 1;
             var flag = true;
 
@@ -247,7 +247,7 @@ namespace NewsForYou.Tests
 
             var mockService = new Mock<IService>();
             var mockConfig = new Mock<IConfiguration>();
-            var controller = new SignUpController(mockService.Object, mockConfig.Object);
+            var controller = new SignUpController(mockService.Object,mockConfig.Object);
             var id = "test@example.com";
             var flag = false;
 

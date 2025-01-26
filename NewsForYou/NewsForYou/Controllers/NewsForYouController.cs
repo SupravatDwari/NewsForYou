@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using NewsForYou.Business;
-using NewsForYou.DAL.Models;
+//using NewsForYou.DAL.Models;
 using NewsForYou.Models;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -19,7 +19,7 @@ namespace NewsForYou.Controllers
         private IService _service;
         private IConfiguration config;
 
-        public NewsForYouController(IService service, IConfiguration configuration)
+        public NewsForYouController(IService service,IConfiguration configuration)
         {
             _service = service;
             config = configuration;
@@ -29,7 +29,7 @@ namespace NewsForYou.Controllers
         [Route("incrementnewsclickcount")]
         public async Task<IActionResult> IncrementNewsClickCount(int id)
         {
-            bool flag = await _service.IncrementNewsClickCount(id);
+            bool flag = true;
             return Ok(new { flag });
         }
     }

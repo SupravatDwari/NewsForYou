@@ -25,7 +25,7 @@ namespace NewsForYou.Controllers
         [Authorize]
         public async Task<IActionResult> GeneratePdf([FromQuery] DateTime startdate, [FromQuery] DateTime enddate)
         {
-            List<ReportModel> report = await _service.GeneratePdf(startdate, enddate);
+            List<ReportModel> report = new List<ReportModel>();
             if (report.Count > 0)
             {
                 return Ok(new { report });

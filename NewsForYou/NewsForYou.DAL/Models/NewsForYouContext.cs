@@ -23,18 +23,17 @@ public partial class NewsForYouContext : DbContext
 
     public virtual DbSet<News> News { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<UserDetail> UserDetails { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=SUPRAVATD-WIN10;Database=NewsForYou;User Id=sa;Password=mindfire;Trust Server Certificate=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Agency>(entity =>
         {
-            entity.HasKey(e => e.AgencyId).HasName("PK__agency__95C546DB2229DE4C");
+            entity.HasKey(e => e.AgencyId).HasName("PK__Agency__95C546DB48461AE8");
 
             entity.ToTable("Agency");
 
@@ -48,44 +47,46 @@ public partial class NewsForYouContext : DbContext
 
         modelBuilder.Entity<AgencyFeed>(entity =>
         {
-            entity.HasKey(e => e.AgencyFeedId).HasName("PK__AgencyFe__CD7F82BDAE616339");
+            entity.HasKey(e => e.AgencyId).HasName("PK__AgencyFe__95C546DBB4E75193");
 
             entity.ToTable("AgencyFeed");
 
+            entity.Property(e => e.AgencyId).ValueGeneratedNever();
+            entity.Property(e => e.AgencyFeedId).ValueGeneratedOnAdd();
             entity.Property(e => e.AgencyFeedUrl)
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            entity.HasOne(d => d.Agency).WithMany(p => p.AgencyFeeds)
-                .HasForeignKey(d => d.AgencyId)
+            entity.HasOne(d => d.Agency).WithOne(p => p.AgencyFeed)
+                .HasForeignKey<AgencyFeed>(d => d.AgencyId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__AgencyFee__Agenc__3E52440B");
+                .HasConstraintName("FK_AgencyFeed_Agency");
 
             entity.HasOne(d => d.Category).WithMany(p => p.AgencyFeeds)
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__AgencyFee__Categ__3F466844");
+                .HasConstraintName("FK_AgencyFeed_Category");
         });
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__category__19093A0BCB572AF9");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Category__19093A0B8B9CFB17");
 
             entity.ToTable("Category");
 
-            entity.Property(e => e.CategoryTitle)
+            entity.Property(e => e.Title)
                 .HasMaxLength(255)
                 .IsUnicode(false);
         });
 
         modelBuilder.Entity<News>(entity =>
         {
-            entity.HasKey(e => e.NewsId).HasName("PK__News__954EBDF3C48C4033");
+            entity.HasKey(e => e.NewsId).HasName("PK__News__954EBDF3675AB9CE");
 
-            entity.HasIndex(e => e.NewsLink, "UQ__News__4BEBCC122B7247C6").IsUnique();
+            entity.HasIndex(e => e.NewsLink, "UQ__News__4BEBCC1266834D5F").IsUnique();
 
             entity.Property(e => e.ClickCount).HasDefaultValue(0);
-            entity.Property(e => e.NewsDescription).IsUnicode(false);
+            entity.Property(e => e.NewsDescription).HasColumnType("text");
             entity.Property(e => e.NewsLink)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -97,19 +98,19 @@ public partial class NewsForYouContext : DbContext
             entity.HasOne(d => d.Agency).WithMany(p => p.News)
                 .HasForeignKey(d => d.AgencyId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__News__AgencyId__44FF419A");
+                .HasConstraintName("FK__News__AgencyId__4316F928");
 
             entity.HasOne(d => d.Category).WithMany(p => p.News)
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__News__CategoryId__440B1D61");
+                .HasConstraintName("FK__News__CategoryId__4222D4EF");
         });
 
-        modelBuilder.Entity<User>(entity =>
+        modelBuilder.Entity<UserDetail>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__206D91709B6E6801");
+            entity.HasKey(e => e.UserId).HasName("PK__UserDeta__1788CC4CAC07067D");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534B2844701").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__UserDeta__A9D10534486BBE23").IsUnique();
 
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
